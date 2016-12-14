@@ -19,7 +19,7 @@
 (defmethod format-param Symbol [val] (format-param (name val)))
 
 (defmethod format-param Date [val]
-  (.format (SimpleDateFormat. "yyyy-MM-dd") val))
+  (str "\"" (.format (SimpleDateFormat. "yyyy-MM-dd") val) "\""))
 
 (defmethod format-param Collection [val]
   (str "("
@@ -65,10 +65,12 @@
       )))
 
 (defn extract-quotes [response]
-  (condp = (get-in response [:body :query :count])
-    0 []
-    1 [(get-in response [:body :query :results :quote])]
-    (get-in response [:body :query :results :quote])))
+  (let [get-count (comp :count :query :body)
+        get-quotes (comp :quote :results :query :body)]
+    (condp = (get-count response)
+     0 []
+     1 [(get-quotes response)]
+     (get-quotes response))))
 
 (defn execute-query [query & params]
   (extract-quotes (client/get (build-url query params) {:as :json})))

@@ -12,7 +12,10 @@
     ))
 
 (defn get-quotes [tickers]
-  (-> (execute-query
+  (->> (execute-query
         "select * from yahoo.finance.quote where symbol in %1" tickers)
     (qd/parse-response)
+    (map (fn [[t ql]] [t (first ql)]))
+    flatten
+    (apply hash-map)
     ))

@@ -1,4 +1,4 @@
-(defproject yql-finance "0.1.0-SNAPSHOT"
+(defproject com.prajnainc/yql-finance "0.1.0-SNAPSHOT"
   :description "Functions to get finance data from the Yahoo public data via YQL"
   :url "https://github.com/wizardpb/yql-finance"
   :license {:name "Eclipse Public License"

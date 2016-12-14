@@ -13,18 +13,20 @@
 
 (defn- parse-ticker [quote-map]
   (into {}
-    (map (fn [[k v]]
-           [k (condp contains? k
-                #{:Symbol} (keyword v)
-                #{:Name} v
-                #{:StockExchange} v
-                #{:Change :Low :High :YearLow :YearHigh :LastTradePriceOnly :AverageDailyVolume :Volume
-                  :DaysHigh :DaysLow} (BigDecimal. v)
-                #{:MarketCapitalization} (convert-suffixed v)
-                #{:DaysRange} (map #(BigDecimal. %1) (str/split v #" - "))
-                )
-            ])
-      (dissoc quote-map :symbol))))
+    (->> (dissoc quote-map :symbol)
+      (filter second)                                       ;Eliminate null entries - returned from bad tickers
+      (map (fn [[k v]]
+             [k (condp contains? k
+                  #{:Symbol} (keyword v)
+                  #{:Name} v
+                  #{:StockExchange} v
+                  #{:Change :Low :High :YearLow :YearHigh :LastTradePriceOnly :AverageDailyVolume :Volume
+                    :DaysHigh :DaysLow} (BigDecimal. v)
+                  #{:MarketCapitalization} (convert-suffixed v)
+                  #{:DaysRange} (map #(BigDecimal. %1) (str/split v #" - "))
+                  )
+              ])
+        ))))
 
 (defn parse-response
   "Take a map built from returned JSON data and parse into a map indexing closing prices by ticker"
